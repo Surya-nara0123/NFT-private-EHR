@@ -38,7 +38,7 @@ joinChannel() {
   local COUNTER=1
   ## Sometimes Join takes time, hence retry
   while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ] ; do
-    sleep $DELAY
+    sleep 1
     set -x
     peer channel join -b $BLOCKFILE >&log.txt
     res=$?

@@ -52,7 +52,7 @@ createChannel() {
 	local bft_true=$1
 	infoln "Adding orderers"
 	while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ] ; do
-		sleep $DELAY
+		sleep 1
 		set -x
     . scripts/orderer.sh ${CHANNEL_NAME}> /dev/null 2>&1
     if [ $bft_true -eq 1 ]; then
@@ -78,7 +78,7 @@ joinChannel() {
 	local COUNTER=1
 	## Sometimes Join takes time, hence retry
 	while [ $rc -ne 0 -a $COUNTER -lt $MAX_RETRY ] ; do
-    sleep $DELAY
+    sleep 1
     set -x
     peer channel join -b $BLOCKFILE >&log.txt
     res=$?

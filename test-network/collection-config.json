@@ -1,0 +1,18 @@
+[
+    {
+        "name": "NFTCollection",
+        "policy": "OR('Org1MSP.peer', 'Org2MSP.peer')",
+        "requiredPeerCount": 1,
+        "maxPeerCount": 2,
+        "blockToLive": 0,
+        "memberOnlyRead": false
+    },
+    {
+        "name": "EHRCollection",
+        "policy": "OR('Org1MSP.peer', 'Org2MSP.peer')",
+        "requiredPeerCount": 1,
+        "maxPeerCount": 2,
+        "blockToLive": 0,
+        "memberOnlyRead": false
+    }
+]
