@@ -10,7 +10,7 @@ import (
 // EHRFraction represents a fraction of the EHR
 type EHRFraction struct {
 	Type        string `json:"type"`
-	DataHash    string `json:"dataHash"`
+	DataIpfs    string `json:"dataIpfs"`
 	AccessLevel string `json:"accessLevel"`
 	Owner       string `json:"owner"`
 }
@@ -39,13 +39,13 @@ func (c *PrivateFractionalEHRNFTContract) InitLedger(ctx contractapi.Transaction
 			Fractions: map[string]EHRFraction{
 				"RadiologyRecords": {
 					Type:        "RadiologyRecords",
-					DataHash:    "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+					DataIpfs:    "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
 					AccessLevel: "RESTRICTED",
 					Owner:       callerID,
 				},
 				"CardioRecords": {
 					Type:        "CardioRecords",
-					DataHash:    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+					DataIpfs:    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
 					AccessLevel: "RESTRICTED",
 					Owner:       callerID,
 				},
@@ -57,7 +57,7 @@ func (c *PrivateFractionalEHRNFTContract) InitLedger(ctx contractapi.Transaction
 			Fractions: map[string]EHRFraction{
 				"LaboratoryResults": {
 					Type:        "LaboratoryResults",
-					DataHash:    "1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014",
+					DataIpfs:    "1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014",
 					AccessLevel: "RESTRICTED",
 					Owner:       "HOSPITAL2",
 				},
@@ -105,7 +105,7 @@ func (c *PrivateFractionalEHRNFTContract) CreatePrivateFractionalEHRNFT(ctx cont
 }
 
 // AddEHRFraction adds a new fraction to the private EHR NFT
-func (c *PrivateFractionalEHRNFTContract) AddEHRFraction(ctx contractapi.TransactionContextInterface, id string, fractionType string, dataHash string, accessLevel string) error {
+func (c *PrivateFractionalEHRNFTContract) AddEHRFraction(ctx contractapi.TransactionContextInterface, id string, fractionType string, DataIpfs string, accessLevel string) error {
 	ehr, err := c.ReadPrivateFractionalEHRNFT(ctx, id)
 	if err != nil {
 		return err
@@ -118,7 +118,7 @@ func (c *PrivateFractionalEHRNFTContract) AddEHRFraction(ctx contractapi.Transac
 
 	ehr.Fractions[fractionType] = EHRFraction{
 		Type:        fractionType,
-		DataHash:    dataHash,
+		DataIpfs:    DataIpfs,
 		AccessLevel: accessLevel,
 		Owner:       clientID,
 	}
