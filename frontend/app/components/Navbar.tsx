@@ -39,6 +39,13 @@ export default function Navbar() {
             </li>
           </>
         )}
+        {userRole === "doctor" && (
+          <li>
+            <Link href="/doctor-upload" className="hover:text-gray-300">
+              Upload Medical Record
+            </Link>
+          </li>
+        )}
         <li>
           <Link href="/marketplace" className="hover:text-gray-300">
             Marketplace
