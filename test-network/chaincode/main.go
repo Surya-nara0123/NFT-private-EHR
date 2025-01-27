@@ -28,55 +28,6 @@ type PrivateFractionalEHRNFTContract struct {
 }
 
 func (c *PrivateFractionalEHRNFTContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	callerID, err := ctx.GetClientIdentity().GetID()
-	if err != nil {
-		return fmt.Errorf("failed to get caller identity: %v", err)
-	}
-	ehrs := []PrivateFractionalEHRNFT{
-		{
-			ID:        "EHR1",
-			PatientID: "PATIENT1",
-			Fractions: map[string]EHRFraction{
-				"RadiologyRecords": {
-					Type:        "RadiologyRecords",
-					DataIpfs:    "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
-					AccessLevel: "RESTRICTED",
-					Owner:       callerID,
-				},
-				"CardioRecords": {
-					Type:        "CardioRecords",
-					DataIpfs:    "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
-					AccessLevel: "RESTRICTED",
-					Owner:       callerID,
-				},
-			},
-		},
-		{
-			ID:        "EHR2",
-			PatientID: "PATIENT2",
-			Fractions: map[string]EHRFraction{
-				"LaboratoryResults": {
-					Type:        "LaboratoryResults",
-					DataIpfs:    "1b4f0e9851971998e732078544c96b36c3d01cedf7caa332359d6f1d83567014",
-					AccessLevel: "RESTRICTED",
-					Owner:       "HOSPITAL2",
-				},
-			},
-		},
-	}
-
-	for _, ehr := range ehrs {
-		ehrJSON, err := json.Marshal(ehr)
-		if err != nil {
-			return fmt.Errorf("failed to marshal EHR: %v", err)
-		}
-
-		err = ctx.GetStub().PutPrivateData("EHRCollection", ehr.ID, ehrJSON)
-		if err != nil {
-			return fmt.Errorf("failed to put EHR data: %v", err)
-		}
-	}
-
 	return nil
 }
 
