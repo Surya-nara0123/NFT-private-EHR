@@ -18,7 +18,6 @@ type EHRFraction struct {
 // PrivateFractionalEHRNFT represents the structure of our private fractional EHR NFT
 type PrivateFractionalEHRNFT struct {
 	ID        string                 `json:"id"`
-	PatientID string                 `json:"patientId"`
 	Fractions map[string]EHRFraction `json:"fractions"`
 }
 
@@ -32,7 +31,7 @@ func (c *PrivateFractionalEHRNFTContract) InitLedger(ctx contractapi.Transaction
 }
 
 // CreatePrivateFractionalEHRNFT creates a new private fractional EHR NFT
-func (c *PrivateFractionalEHRNFTContract) CreatePrivateFractionalEHRNFT(ctx contractapi.TransactionContextInterface, id string, patientID string) error {
+func (c *PrivateFractionalEHRNFTContract) CreatePrivateFractionalEHRNFT(ctx contractapi.TransactionContextInterface, id string) error {
 	exists, err := c.PrivateFractionalEHRNFTExists(ctx, id)
 	if err != nil {
 		return err
@@ -43,7 +42,6 @@ func (c *PrivateFractionalEHRNFTContract) CreatePrivateFractionalEHRNFT(ctx cont
 
 	ehr := PrivateFractionalEHRNFT{
 		ID:        id,
-		PatientID: patientID,
 		Fractions: make(map[string]EHRFraction),
 	}
 

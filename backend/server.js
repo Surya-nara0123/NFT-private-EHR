@@ -147,10 +147,6 @@ async function newSigner() {
     return signers.newPrivateKeySigner(privateKey);
 }
 
-/**
- * This type of transaction would typically only be run once by an application the first time it was started after its
- * initial deployment. A new version of the chaincode deployed later would likely not need to run an "init" function.
- */
 async function initLedger(contract) {
     console.log(
         '\n--> Submit Transaction: InitLedger, function creates the initial set of assets on the ledger'
@@ -161,120 +157,86 @@ async function initLedger(contract) {
     console.log('*** Transaction committed successfully');
 }
 
-/**
- * Evaluate a transaction to query ledger state.
- */
-async function getAllAssets(contract) {
-    console.log(
-        '\n--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger'
+async function CreatePrivateFractionalEHRNFT(contract, id) {
+    // console.log(
+    //     '\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments'
+    // );
+    await contract.submitTransaction(
+        'CreatePrivateFractionalEHRNFT',
+        id
     );
 
-    const resultBytes = await contract.evaluateTransaction('GetAllAssets');
-
-    const resultJson = utf8Decoder.decode(resultBytes);
-    const result = JSON.parse(resultJson);
-    console.log('*** Result:', result);
+    console.log('*** Transaction committed successfully');
 }
 
-/**
- * Submit a transaction synchronously, blocking until it has been committed to the ledger.
- */
-async function createAsset(contract) {
+async function AddEHRFraction(contract, id, fractionType, DataIpfs, accessLevel) {
     console.log(
         '\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments'
     );
 
     await contract.submitTransaction(
-        'CreateAsset',
-        assetId,
-        'yellow',
-        '5',
-        'Tom',
-        '1300'
+        'AddEHRFraction',
+        id,
+        fractionType,
+        DataIpfs,
+        accessLevel
     );
 
     console.log('*** Transaction committed successfully');
 }
 
-/**
- * Submit transaction asynchronously, allowing the application to process the smart contract response (e.g. update a UI)
- * while waiting for the commit notification.
- */
-async function transferAssetAsync(contract) {
+async function TransferEHRFraction(contract, id, fractionType, newOwner) {
     console.log(
-        '\n--> Async Submit Transaction: TransferAsset, updates existing asset owner'
+        '\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments'
     );
 
-    const commit = await contract.submitAsync('TransferAsset', {
-        arguments: [assetId, 'Saptha'],
-    });
-    const oldOwner = utf8Decoder.decode(commit.getResult());
-
-    console.log(
-        `*** Successfully submitted transaction to transfer ownership from ${oldOwner} to Saptha`
+    await contract.submitTransaction(
+        'TransferEHRFraction',
+        id,
+        fractionType,
+        newOwner
     );
-    console.log('*** Waiting for transaction commit');
-
-    const status = await commit.getStatus();
-    if (!status.successful) {
-        throw new Error(
-            `Transaction ${
-                status.transactionId
-            } failed to commit with status code ${String(status.code)}`
-        );
-    }
 
     console.log('*** Transaction committed successfully');
 }
 
-async function readAssetByID(contract) {
-    console.log(
-        '\n--> Evaluate Transaction: ReadAsset, function returns asset attributes'
-    );
+async function ReadPrivateFractionalEHRNFT(contract, id) {
+    // console.log(
+    //     '\n--> Evaluate Transaction: ReadAsset, function returns asset attributes'
+    // );
 
     const resultBytes = await contract.evaluateTransaction(
-        'ReadAsset',
-        assetId
+        'ReadPrivateFractionalEHRNFT',
+        id
     );
 
     const resultJson = utf8Decoder.decode(resultBytes);
     const result = JSON.parse(resultJson);
-    console.log('*** Result:', result);
+    console.log('*** Done');
+    return result;
 }
 
-/**
- * submitTransaction() will throw an error containing details of any error responses from the smart contract.
- */
-async function updateNonExistentAsset(contract) {
-    console.log(
-        '\n--> Submit Transaction: UpdateAsset asset70, asset70 does not exist and should return an error'
+async function ReadEHRFraction(contract, id, fractionType) {
+    // console.log(
+    //     '\n--> Evaluate Transaction: ReadAsset, function returns asset attributes'
+    // );
+
+    const resultBytes = await contract.evaluateTransaction(
+        'ReadEHRFraction',
+        id,
+        fractionType
     );
 
-    try {
-        await contract.submitTransaction(
-            'UpdateAsset',
-            'asset70',
-            'blue',
-            '5',
-            'Tomoko',
-            '300'
-        );
-        console.log('******** FAILED to return an error');
-    } catch (error) {
-        console.log('*** Successfully caught the error: \n', error);
-    }
+    const resultJson = utf8Decoder.decode(resultBytes);
+    const result = JSON.parse(resultJson);
+    console.log('*** Done');
+    return result;
 }
 
-/**
- * envOrDefault() will return the value of an environment variable, or a default value if the variable is undefined.
- */
 function envOrDefault(key, defaultValue) {
     return process.env[key] || defaultValue;
 }
 
-/**
- * displayInputParameters() will print the global scope parameters used by the main driver routine.
- */
 function displayInputParameters() {
     console.log(`channelName:       ${channelName}`);
     console.log(`chaincodeName:     ${chaincodeName}`);
@@ -289,12 +251,16 @@ function displayInputParameters() {
 
 const app = express();
 const port = process.env.PORT || 3000;
+let contract, network;
+initConnection().then((val)=>{
+    network = val.network
+    contract = val.contract
+})
 
 app.use(express.json());
 // Initialize the ledger
 app.post('/api/initLedger', async (req, res) => {
     try {
-        const { network, contract } = await initConnection();
         initLedger(contract).then((val) => {
             res.json('InitLedger function executed successfully');
         });
@@ -310,13 +276,8 @@ app.post('/api/initLedger', async (req, res) => {
 // Create a new EHR
 app.post('/api/createEHR', async (req, res) => {
     try {
-        const { id, patientID } = req.body;
-        const { contract } = await getNetworkConnection();
-        await contract.submitTransaction(
-            'CreatePrivateFractionalEHRNFT',
-            id,
-            patientID
-        );
+        const { id } = await req.body;
+        await CreatePrivateFractionalEHRNFT(contract, id)
         res.json({ message: 'EHR created successfully' });
     } catch (error) {
         console.error(`Failed to create EHR: ${error}`);
@@ -327,15 +288,8 @@ app.post('/api/createEHR', async (req, res) => {
 // Add a fraction to an EHR
 app.post('/api/addFraction', async (req, res) => {
     try {
-        const { id, fractionType, dataHash, accessLevel } = req.body;
-        const { contract } = await getNetworkConnection();
-        await contract.submitTransaction(
-            'AddEHRFraction',
-            id,
-            fractionType,
-            dataHash,
-            accessLevel
-        );
+        const { id, fractionType, DataIpfs, accessLevel} = req.body;
+        await AddEHRFraction(contract, id, fractionType, DataIpfs, accessLevel)
         res.json({ message: 'Fraction added successfully' });
     } catch (error) {
         console.error(`Failed to add fraction: ${error}`);
@@ -347,13 +301,7 @@ app.post('/api/addFraction', async (req, res) => {
 app.post('/api/transferFraction', async (req, res) => {
     try {
         const { id, fractionType, newOwner } = req.body;
-        const { contract } = await getNetworkConnection();
-        await contract.submitTransaction(
-            'TransferEHRFraction',
-            id,
-            fractionType,
-            newOwner
-        );
+        await TransferEHRFraction(contract, id, fractionType, newOwner);
         res.json({ message: 'Fraction transferred successfully' });
     } catch (error) {
         console.error(`Failed to transfer fraction: ${error}`);
@@ -362,15 +310,12 @@ app.post('/api/transferFraction', async (req, res) => {
 });
 
 // Read an EHR
-app.get('/api/readEHR/:id', async (req, res) => {
+app.get('/api/readEHR', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { contract } = await getNetworkConnection();
-        const result = await contract.evaluateTransaction(
-            'ReadPrivateFractionalEHRNFT',
-            id
-        );
-        res.json(JSON.parse(result.toString()));
+        const { id } = req.body;
+        const result = await ReadPrivateFractionalEHRNFT(contract, id)
+        console.log(result);
+        res.json(result);
     } catch (error) {
         console.error(`Failed to read EHR: ${error}`);
         res.status(500).json({ error: 'Failed to read EHR' });
@@ -378,16 +323,11 @@ app.get('/api/readEHR/:id', async (req, res) => {
 });
 
 // Read a specific fraction
-app.get('/api/readFraction/:id/:fractionType', async (req, res) => {
+app.get('/api/readFraction/', async (req, res) => {
     try {
-        const { id, fractionType } = req.params;
-        const { contract } = await getNetworkConnection();
-        const result = await contract.evaluateTransaction(
-            'ReadEHRFraction',
-            id,
-            fractionType
-        );
-        res.json(JSON.parse(result.toString()));
+        const { id, fractionType } = req.body;
+        const result = await ReadEHRFraction(contract, id, fractionType);
+        res.json(result);
     } catch (error) {
         console.error(`Failed to read fraction: ${error}`);
         res.status(500).json({ error: 'Failed to read fraction' });
