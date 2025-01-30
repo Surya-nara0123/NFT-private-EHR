@@ -1,0 +1,118 @@
+{
+    "PatientInfo": {
+      "id": "P12345",
+      "name": "John Doe",
+      "dateOfBirth": "1985-03-15",
+      "gender": "Male",
+      "bloodType": "A+"
+    },
+    "Radiology": {
+      "examinations": [
+        {
+          "date": "2023-05-10",
+          "type": "X-Ray",
+          "bodyPart": "Chest",
+          "findings": "No abnormalities detected",
+          "imageUrl": "https://example.com/xray-chest-20230510.jpg"
+        },
+        {
+          "date": "2023-06-22",
+          "type": "MRI",
+          "bodyPart": "Brain",
+          "findings": "Small benign lesion detected in the frontal lobe",
+          "imageUrl": "https://example.com/mri-brain-20230622.jpg"
+        }
+      ]
+    },
+    "Cardiology": {
+      "examinations": [
+        {
+          "date": "2023-04-05",
+          "type": "ECG",
+          "result": "Normal sinus rhythm",
+          "heartRate": 72,
+          "QTInterval": 420
+        }
+      ],
+      "medications": [
+        {
+          "name": "Lisinopril",
+          "dosage": "10mg",
+          "frequency": "Once daily",
+          "startDate": "2023-01-15"
+        }
+      ]
+    },
+    "Laboratory": {
+      "bloodTests": [
+        {
+          "date": "2023-07-01",
+          "type": "Complete Blood Count",
+          "results": {
+            "WBC": 7.5,
+            "RBC": 5.2,
+            "Hemoglobin": 15.2,
+            "Hematocrit": 45,
+            "Platelets": 250
+          }
+        },
+        {
+          "date": "2023-07-01",
+          "type": "Lipid Panel",
+          "results": {
+            "TotalCholesterol": 180,
+            "LDL": 100,
+            "HDL": 50,
+            "Triglycerides": 150
+          }
+        }
+      ]
+    },
+    "Allergies": [
+      {
+        "allergen": "Penicillin",
+        "severity": "Moderate",
+        "reactions": ["Rash", "Difficulty breathing"]
+      },
+      {
+        "allergen": "Peanuts",
+        "severity": "Severe",
+        "reactions": ["Anaphylaxis"]
+      }
+    ],
+    "Immunizations": [
+      {
+        "vaccine": "Influenza",
+        "date": "2022-10-15",
+        "lotNumber": "FL789456"
+      },
+      {
+        "vaccine": "COVID-19",
+        "date": "2021-04-20",
+        "manufacturer": "Pfizer",
+        "lotNumber": "EW0182"
+      }
+    ],
+    "MedicalHistory": {
+      "conditions": [
+        {
+          "name": "Hypertension",
+          "diagnosisDate": "2020-03-10",
+          "status": "Ongoing"
+        },
+        {
+          "name": "Appendicitis",
+          "diagnosisDate": "2015-07-22",
+          "status": "Resolved",
+          "treatment": "Appendectomy"
+        }
+      ],
+      "surgeries": [
+        {
+          "procedure": "Appendectomy",
+          "date": "2015-07-23",
+          "surgeon": "Dr. Jane Smith"
+        }
+      ]
+    }
+  }

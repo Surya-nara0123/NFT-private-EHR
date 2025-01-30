@@ -186,6 +186,29 @@ func (c *PrivateFractionalEHRNFTContract) verifyCallerAccess(ctx contractapi.Tra
 	return nil
 }
 
+func (c *PrivateFractionalEHRNFTContract) changeNFTFractionAccess(ctx contractapi.TransactionContextInterface, newAccessLevel string, id string, fractionType string) error {
+	ehr, err := c.ReadPrivateFractionalEHRNFT(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	fraction, exists := ehr.Fractions[fractionType]
+	if !exists {
+		return fmt.Errorf("fraction %s does not exist in EHR %s", fractionType, id)
+	}
+
+	fraction.AccessLevel = newAccessLevel
+	ehr.Fractions[fractionType] = fraction
+
+	ehrJSON, err := json.Marshal(ehr)
+	if err != nil {
+		return err
+	}
+
+	return ctx.GetStub().PutPrivateData("EHRCollection", id, ehrJSON)
+
+}
+
 func main() {
 	privateFractionalEHRNFTChaincode, err := contractapi.NewChaincode(&PrivateFractionalEHRNFTContract{})
 	if err != nil {

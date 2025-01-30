@@ -5,7 +5,7 @@ import { getNFTs, buyNFT } from "../utils/nftUtils"
 import NFTCard from "../components/NFTCard"
 
 export default function MarketplacePage() {
-  const [nfts, setNfts] = useState([])
+  const [nfts, setNfts] = useState<Array<any>>([])
   const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
@@ -13,15 +13,19 @@ export default function MarketplacePage() {
   }, [])
 
   const fetchNFTs = async () => {
-    const fetchedNFTs = await getNFTs()
-    setNfts(fetchedNFTs)
+    try {
+      const fetchedNFTs = JSON.parse(localStorage.getItem("marketplaceListings")!);
+      setNfts(fetchedNFTs)
+    } catch (error) {
+      console.error("Error fetching NFTs:", error)
+    }
   }
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value)
   }
 
-  const filteredNFTs = nfts.filter((nft) => nft.metadata.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredNFTs = nfts.filter((nft) => nft.tokenId.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const handleBuy = async (tokenId: string) => {
     try {

@@ -1,6 +1,7 @@
 const express = require('express');
 const { Gateway, Wallets } = require('fabric-network');
 const FabricCAServices = require('fabric-ca-client');
+const cors = require('cors');
 // const path = require("path")
 // const fs = require("fs")
 require('dotenv').config();
@@ -161,15 +162,18 @@ async function CreatePrivateFractionalEHRNFT(contract, id) {
     // console.log(
     //     '\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments'
     // );
-    await contract.submitTransaction(
-        'CreatePrivateFractionalEHRNFT',
-        id
-    );
+    await contract.submitTransaction('CreatePrivateFractionalEHRNFT', id);
 
     console.log('*** Transaction committed successfully');
 }
 
-async function AddEHRFraction(contract, id, fractionType, DataIpfs, accessLevel) {
+async function AddEHRFraction(
+    contract,
+    id,
+    fractionType,
+    DataIpfs,
+    accessLevel
+) {
     console.log(
         '\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments'
     );
@@ -233,6 +237,24 @@ async function ReadEHRFraction(contract, id, fractionType) {
     return result;
 }
 
+async function changeNFTFractionAccess(contract, newLevel, id, fractionType) {
+    // console.log(
+    //     '\n--> Evaluate Transaction: ReadAsset, function returns asset attributes'
+    // );
+
+    const resultBytes = await contract.evaluateTransaction(
+        'changeNFTFractionAccess',
+        newLevel,
+        id,
+        fractionType
+    );
+
+    const resultJson = utf8Decoder.decode(resultBytes);
+    const result = JSON.parse(resultJson);
+    console.log('*** Done');
+    return result;
+}
+
 function envOrDefault(key, defaultValue) {
     return process.env[key] || defaultValue;
 }
@@ -252,10 +274,20 @@ function displayInputParameters() {
 const app = express();
 const port = process.env.PORT || 3000;
 let contract, network;
-initConnection().then((val)=>{
-    network = val.network
-    contract = val.contract
-})
+initConnection().then((val) => {
+    network = val.network;
+    contract = val.contract;
+});
+
+app.use(function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, DELETE, OPTIONS'
+    );
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
 app.use(express.json());
 // Initialize the ledger
@@ -277,7 +309,7 @@ app.post('/api/initLedger', async (req, res) => {
 app.post('/api/createEHR', async (req, res) => {
     try {
         const { id } = await req.body;
-        await CreatePrivateFractionalEHRNFT(contract, id)
+        await CreatePrivateFractionalEHRNFT(contract, id);
         res.json({ message: 'EHR created successfully' });
     } catch (error) {
         console.error(`Failed to create EHR: ${error}`);
@@ -288,8 +320,8 @@ app.post('/api/createEHR', async (req, res) => {
 // Add a fraction to an EHR
 app.post('/api/addFraction', async (req, res) => {
     try {
-        const { id, fractionType, DataIpfs, accessLevel} = req.body;
-        await AddEHRFraction(contract, id, fractionType, DataIpfs, accessLevel)
+        const { id, fractionType, DataIpfs, accessLevel } = req.body;
+        await AddEHRFraction(contract, id, fractionType, DataIpfs, accessLevel);
         res.json({ message: 'Fraction added successfully' });
     } catch (error) {
         console.error(`Failed to add fraction: ${error}`);
@@ -309,11 +341,23 @@ app.post('/api/transferFraction', async (req, res) => {
     }
 });
 
+// update access levels of an nft fractions
+app.post('/api/changeNFTFractionAccess', async (req, res) => {
+    try {
+        const { id, fractionType, newLevel } = req.body;
+        await changeNFTFractionAccess(contract, newLevel, id, fractionType);
+        res.json({ message: 'Fraction transferred successfully' });
+    } catch (error) {
+        console.error(`Failed to transfer fraction: ${error}`);
+        res.status(500).json({ error: 'Failed to transfer fraction' });
+    }
+});
+
 // Read an EHR
 app.get('/api/readEHR', async (req, res) => {
     try {
         const { id } = req.body;
-        const result = await ReadPrivateFractionalEHRNFT(contract, id)
+        const result = await ReadPrivateFractionalEHRNFT(contract, id);
         console.log(result);
         res.json(result);
     } catch (error) {

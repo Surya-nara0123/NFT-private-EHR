@@ -35,12 +35,12 @@ export default function MintPage() {
 
     setMinting(true)
     try {
-      const id = await mintNFT(hashToMint)
-      setTokenId(id)
+      const result = await mintNFT(hashToMint)
+      setTokenId(result)
 
       // Store the minted NFT in local storage
       const mintedNFTs = JSON.parse(localStorage.getItem("mintedNFTs") || "[]")
-      mintedNFTs.push({ tokenId: id, ipfsHash: hashToMint, date: new Date().toISOString() })
+      mintedNFTs.push({ tokenId: result, ipfsHash: hashToMint, date: new Date().toISOString() })
       localStorage.setItem("mintedNFTs", JSON.stringify(mintedNFTs))
     } catch (error) {
       console.error("Error minting NFT:", error)
