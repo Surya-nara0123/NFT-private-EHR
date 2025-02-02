@@ -21,7 +21,7 @@ const { TextDecoder } = require('node:util');
 
 const channelName = envOrDefault('CHANNEL_NAME', 'mychannel');
 const chaincodeName = envOrDefault('CHAINCODE_NAME', 'cc1');
-const mspId = envOrDefault('MSP_ID', 'Org1MSP');
+const mspId = envOrDefault('MSP_ID', 'Org2MSP');
 
 // Path to crypto materials.
 const cryptoPath = envOrDefault(
@@ -32,7 +32,7 @@ const cryptoPath = envOrDefault(
         'test-network',
         'organizations',
         'peerOrganizations',
-        'org1.example.com'
+        'org2.example.com'
     )
 );
 
@@ -42,7 +42,7 @@ const keyDirectoryPath = envOrDefault(
     path.resolve(
         cryptoPath,
         'users',
-        'User1@org1.example.com',
+        'User1@org2.example.com',
         'msp',
         'keystore'
     )
@@ -54,7 +54,7 @@ const certDirectoryPath = envOrDefault(
     path.resolve(
         cryptoPath,
         'users',
-        'User1@org1.example.com',
+        'User1@org2.example.com',
         'msp',
         'signcerts'
     )
@@ -63,14 +63,14 @@ const certDirectoryPath = envOrDefault(
 // Path to peer tls certificate.
 const tlsCertPath = envOrDefault(
     'TLS_CERT_PATH',
-    path.resolve(cryptoPath, 'peers', 'peer0.org1.example.com', 'tls', 'ca.crt')
+    path.resolve(cryptoPath, 'peers', 'peer0.org2.example.com', 'tls', 'ca.crt')
 );
 
 // Gateway peer endpoint.
-const peerEndpoint = envOrDefault('PEER_ENDPOINT', 'localhost:7051');
+const peerEndpoint = envOrDefault('PEER_ENDPOINT', 'localhost:9051');
 
 // Gateway peer SSL host name override.
-const peerHostAlias = envOrDefault('PEER_HOST_ALIAS', 'peer0.org1.example.com');
+const peerHostAlias = envOrDefault('PEER_HOST_ALIAS', 'peer0.org2.example.com');
 
 const utf8Decoder = new TextDecoder();
 const assetId = `asset${String(Date.now())}`;
@@ -277,17 +277,20 @@ async function getId(contract) {
     //     '\n--> Evaluate Transaction: ReadAsset, function returns asset attributes'
     // );
 
-    const resultBytes = await contract.evaluateTransaction(
+    let resultBytes = await contract.evaluateTransaction(
         'returnCallerID'
     );
-
+    // for(let i of resultBytes){
+    //     console.log(String.fromCharCode(i)[0]);
+    // }
+    // resultBytes = resultBytes.slice(1, resultBytes.length);
     const resultJson = utf8Decoder.decode(resultBytes);
     console.log('*** Done');
     return resultJson;
 }
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT1 || 3000;
 let contract, network;
 initConnection().then((val) => {
     network = val.network;
@@ -397,7 +400,8 @@ app.get("/api/getId", async (req, res) => {
     console.log("here")
     try {
         const result = await getId(contract);
-        res.json(result);
+        console.log(result)
+        res.json({result: result});
     } catch (e) {
         console.error(e)
         res.status(500).json({ error: 'Failed to get ID' });

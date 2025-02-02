@@ -22,6 +22,14 @@ interface MintedNFT {
   listedInMarketplace?: boolean
 }
 
+interface MintedNFTPublic {
+  tokenId: string
+  // ipfsHash: string
+  category: string
+  date: string
+  price?: string
+}
+
 interface DoctorUpload {
   name: string
   content: any
@@ -97,11 +105,17 @@ export default function MyUploadsPage() {
         category: upload.category,
         date: new Date().toISOString(),
       }
+
+      const newNFT1: MintedNFTPublic = {
+        tokenId,
+        category: upload.category,
+        date: new Date().toISOString(),
+      }
       setMintedNFTs((prev) => [...prev, newNFT])
 
       // Update local storage
       const storedMintedNFTs = JSON.parse(localStorage.getItem("mintedNFTs") || "[]")
-      storedMintedNFTs.push(newNFT)
+      storedMintedNFTs.push(newNFT1)
       localStorage.setItem("mintedNFTs", JSON.stringify(storedMintedNFTs))
 
       alert(`NFT minted successfully! Token ID: ${tokenId}`)

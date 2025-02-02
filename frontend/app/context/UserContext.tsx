@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useContext, type ReactNode } from "react"
 
-type UserRole = "patient" | "doctor" | null
+type UserRole = "patient" | "doctor" | "external" | null
 
 interface UserContextType {
   userRole: UserRole

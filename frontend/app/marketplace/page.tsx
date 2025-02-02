@@ -25,11 +25,19 @@ export default function MarketplacePage() {
     setSearchTerm(e.target.value)
   }
 
-  const filteredNFTs = nfts.filter((nft) => nft.tokenId.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredNFTs = nfts.filter((nft) => nft.tokenId.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const handleBuy = async (tokenId: string) => {
+  const handleBuy = async (tokenId: string, type: string) => {
     try {
-      await buyNFT(tokenId)
+      const res = await fetch("http://127.0.0.1:3001/api/getId", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      const body = await res.json()
+      const id = body.result;
+      await buyNFT(tokenId, id, type)
       // Refresh NFTs after purchase
       fetchNFTs()
     } catch (error) {
@@ -49,7 +57,7 @@ export default function MarketplacePage() {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredNFTs.map((nft) => (
-          <NFTCard key={nft.tokenId} nft={nft} onBuy={handleBuy} />
+          <NFTCard key={nft.tokenId} nft={nft} onBuy={() => handleBuy(nft.tokenId, nft.fractionType)} />
         ))}
       </div>
     </div>

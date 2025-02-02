@@ -186,7 +186,7 @@ func (c *PrivateFractionalEHRNFTContract) verifyCallerAccess(ctx contractapi.Tra
 	return nil
 }
 
-func (c *PrivateFractionalEHRNFTContract) changeNFTFractionAccess(ctx contractapi.TransactionContextInterface, newAccessLevel string, id string, fractionType string) error {
+func (c *PrivateFractionalEHRNFTContract) ChangeNFTFractionAccess(ctx contractapi.TransactionContextInterface, newAccessLevel string, id string, fractionType string) error {
 	ehr, err := c.ReadPrivateFractionalEHRNFT(ctx, id)
 	if err != nil {
 		return err
@@ -207,6 +207,17 @@ func (c *PrivateFractionalEHRNFTContract) changeNFTFractionAccess(ctx contractap
 
 	return ctx.GetStub().PutPrivateData("EHRCollection", id, ehrJSON)
 
+}
+
+func (c *PrivateFractionalEHRNFTContract) ReturnCallerID(ctx contractapi.TransactionContextInterface) (string, error) {
+	// In a real-world scenario, you would implement more sophisticated access control here
+	// This is a simplified example
+	callerID, err := ctx.GetClientIdentity().GetID()
+	if err != nil {
+		return "", fmt.Errorf("failed to get caller identity: %v", err)
+	}
+
+	return callerID, nil
 }
 
 func main() {

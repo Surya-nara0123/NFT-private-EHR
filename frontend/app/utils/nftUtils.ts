@@ -22,12 +22,12 @@ export async function getNFTs() {
   }
 }
 
-export async function buyNFT(tokenId: string): Promise<void> {
+export async function buyNFT(tokenId: string, id: number, fractionType: string) : Promise<void> {
   try {
     await axios.post(`${API_BASE_URL}/transferFraction`, {
       id: tokenId,
       fractionType: "ownership", // Assuming 'ownership' is the fraction type for buying
-      newOwner: "current_user_id", // Replace with actual user ID
+      newOwner: `${id}`, // Replace with actual user ID
     })
   } catch (error) {
     console.error("Error buying NFT:", error)
